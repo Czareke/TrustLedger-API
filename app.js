@@ -7,6 +7,12 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const AppError = require('./utils/appError');
 const dotenv = require('dotenv');
+const authRoutes = require('./routes/authRoutes');
+const userRoutes = require('./routes/userRoutes');
+const accountRoutes = require('./routes/accountRoutes');
+const transactionRoutes = require('./routes/transactionRoutes');
+const cardRoutes = require('./routes/cardRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 
 // Load environment variables before any other code
 dotenv.config();
@@ -61,6 +67,14 @@ app.get('/health', (req, res) => {
         timestamp: new Date()
     });
 });
+
+// API Routes
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/users', userRoutes);
+app.use('/api/v1/accounts', accountRoutes);
+app.use('/api/v1/transactions', transactionRoutes);
+app.use('/api/v1/cards', cardRoutes);
+app.use('/api/v1/admin', adminRoutes);
 
 // Handle undefined routes
 app.all('*', (req, res, next) => {

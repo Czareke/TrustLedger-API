@@ -32,21 +32,31 @@ const createSendToken = (user, statusCode, res) => {
 };
 
 exports.signup = catchAsync(async (req, res, next) => {
+    // Check if email already exists
+    const existingUser = await User.findOne({ email: req.body.email });
+    if (existingUser) {
+        return next(new AppError('Email already exists. Please use a different email or login instead.', 400));
+    }
+
     const newUser = await User.create({
         name: req.body.name,
         email: req.body.email,
         password: req.body.password,
         passwordConfirm: req.body.passwordConfirm,
-        role: 'user'
+        role: 'customer'
     });
 
     // Send welcome email
-    const welcomeMessage = `Welcome to our banking system, ${newUser.name}! Thank you for choosing us.`;
-    await sendEmail({
-        email: newUser.email,
-        subject: 'Welcome to Our Banking System',
-        message: welcomeMessage
-    });
+    try {
+        await sendEmail({
+            email: newUser.email,
+            subject: 'Welcome to TrustLedger Bank',
+            message: `Welcome to our banking system, ${newUser.name}! Thank you for choosing us.`
+        });
+    } catch (error) {
+        // Don't fail registration if email fails
+        console.error('Welcome email could not be sent:', error);
+    }
 
     createSendToken(newUser, 201, res);
 });
